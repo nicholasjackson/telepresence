@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -219,6 +220,13 @@ func checkLegacyCmd(cmd *cobra.Command, args []string) error {
 
 	if tp2Cmd != "" {
 		fmt.Fprintf(cmd.OutOrStdout(), "\nYou used a telepresence 1 command that roughly translates to the following:\ntelepresence %s\n", tp2Cmd)
+		ctx := context.Background()
+		fmt.Fprintln(cmd.OutOrStdout(), "running...")
+		newCmd := Command(ctx)
+		newCmd.SetArgs(strings.Split(tp2Cmd, " "))
+		if err := newCmd.ExecuteContext(ctx); err != nil {
+			fmt.Fprintln(cmd.ErrOrStderr(), err)
+		}
 	}
 	return nil
 }
